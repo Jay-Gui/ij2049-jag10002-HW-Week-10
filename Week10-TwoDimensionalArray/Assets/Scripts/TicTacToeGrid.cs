@@ -52,13 +52,13 @@ public class TicTacToeGrid : MonoBehaviour
     }
 
     //arbitrary numbers where each number is a state
-    // If a space is 1, it's "blue"
+    // If a space is 1, it's "ex"
     public bool ContainsEx(int x, int y)
     {
         return grid[x, y] == 1;
     }
 
-    // If a space is 2, it's "red"
+    // If a space is 2, it's "oh"
     public bool ContainsOh(int x, int y)
     {
         return grid[x, y] == 2;
@@ -70,31 +70,22 @@ public class TicTacToeGrid : MonoBehaviour
         return grid[x, y] == 0;
     }
 
-    // If the highest space in the column is empty, 
-    // you can add another piece.
-    public bool ColumnFilled(int column)
-    {
-        return !IsEmpty(column, height - 1);
-    }
-
     // This function is used to add a piece to a column
-    public void AddToColumn(int column)
+    public void AddToColumn(string column)
     {
-        // If a column is full, do nothing.
-        if (ColumnFilled(column)) return;
-
         // If either player has already won, do nothing.
         if (ExWin() || OhWin()) return;
         
-        // Find the lowest empty space in the column, and add a piece.
-        for (var y = 0; y < height; y++)
-        {
-            if (IsEmpty(column, y))
+        //take a string and turn it into two different integers
+        if (IsEmpty(int.Parse(column.Substring(0,1)), 
+                int.Parse(column.Substring(1, 1))))
             {
                 if (ohTurn)
-                    grid[column, y] = 2;
+                    grid[int.Parse(column.Substring(0,1)), 
+                        int.Parse(column.Substring(1,1))] = 2;
                 else
-                    grid[column, y] = 1;
+                    grid[int.Parse(column.Substring(0,1)), 
+                        int.Parse(column.Substring(1,1))] = 1;
 
                 ohTurn = !ohTurn;
 
@@ -102,9 +93,7 @@ public class TicTacToeGrid : MonoBehaviour
                 UpdateDisplay();
                 return;
             }
-        }
     }
-
     private void UpdateDisplay()
     {
         // To update the display, first destroy all the pieces that were spawned.
@@ -162,46 +151,41 @@ public class TicTacToeGrid : MonoBehaviour
         return ThreeInARow() == 1;
     }
 
-    // This function checks for four in a row, and returns the number that is four in a row.
-    // 1 for blue
-    // 2 for red
+    // This function checks for three in a row, and returns the number that is three in a row.
+    // 1 for ex
+    // 2 for oh
     public int ThreeInARow()
     {
         for (var x = 0; x < width; x++)
         {
             for (var y = 0; y < height; y++)
             {
-                if (y <= height - 4)
+                if (y <= height - 3)
                     if (grid[x,y] != 0 && 
                         grid[x, y] == grid[x, y + 1] && 
-                        grid[x, y] == grid[x, y + 2] && 
-                        grid[x, y] == grid[x, y + 3])
+                        grid[x, y] == grid[x, y + 2])
                         return grid[x, y];
              
-                if (x <= width - 4)           
+                if (x <= width - 3)           
                     //is there a piece there (0 == empty, remember?)?
                     if (grid[x,y] != 0 && 
-                        //is the piece that' there equal to the one above it?
+                        //is the piece that's there equal to the one next to it?
                         grid[x, y] == grid[x + 1, y] && 
-                        //is this equal to the one above it?
-                        grid[x, y] == grid[x + 2, y] && 
-                        // and is this equal to the one above it?
-                        grid[x, y] == grid[x + 3, y])
-                        //if these are all the same, then we have a connect four
+                        //is this equal to the one next to it?
+                        grid[x, y] == grid[x + 2, y])
+                        //if these are all the same, then we have three in a row
                         return grid[x, y];
 
-                if (x <= width - 4 && y <= height - 4)
+                if (x <= width - 3 && y <= height - 3)
                     if (grid[x,y] != 0 && 
                         grid[x, y] == grid[x + 1, y + 1] && 
-                        grid[x, y] == grid[x + 2, y + 2] && 
-                        grid[x, y] == grid[x + 3, y + 3])
+                        grid[x, y] == grid[x + 2, y + 2])
                         return grid[x, y];
 
-                if (x >= width - 4 && y <= height - 4)
+                if (x == width - 1 && y <= height - 3)
                     if (grid[x,y] != 0 && 
                         grid[x, y] == grid[x - 1, y + 1] && 
-                        grid[x, y] == grid[x - 2, y + 2] && 
-                        grid[x, y] == grid[x - 3, y + 3])
+                        grid[x, y] == grid[x - 2, y + 2])
                         return grid[x, y];
             }
         }
